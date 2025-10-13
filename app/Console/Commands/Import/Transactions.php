@@ -31,10 +31,12 @@ class Transactions extends Command
         'type' => $row['Type'],
         'date' => $row['Date'],
         'symbol' => $row['Symbol'],
-        'units' => $row['Quantity'],
-        'price' => $row['Price'],
+        'units' => $row['Units'],
+        'unit_price' => $row['Unit Price'],
         'account_id' => $account->id,
       ]);
+
+      $model->date_bank_processed = $model->date;
 
       $model->save();
     }
