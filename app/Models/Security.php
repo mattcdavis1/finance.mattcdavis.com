@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Security extends Model
+{
+  protected $table = 'securities';
+  protected $fillable = [
+    'allocation_max',
+    'allocation_recommended',
+    'buy_under',
+    'change_percent_5day',
+    'change_percent_day',
+    'change_percent_month',
+    'change_percent_ytd',
+    'change',
+    'coupon_rate',
+    'created_at',
+    'credit_rating',
+    'cusip',
+    'description',
+    'dividend_annual_iex',
+    'dividend_annual',
+    'dividend_annual_override',
+    'dividend_frequency',
+    'dividend_pay_day',
+    'dividend_pay_months',
+    'dividend_yield_iex',
+    'dividend_yield_ttm_iex',
+    'dividend_yield_user',
+    'dividend_yield',
+    'external_id',
+    'ex_div_date',
+    'ex_div_next_date',
+    'finra_link',
+    'has_k1',
+    'has_qdi',
+    'hdo_sell_alert_date',
+    'hdo_sell_alert_price',
+    'industry',
+    'maturity_date',
+    'min_call_date',
+    'next_earnings_date',
+    'payment_next_date',
+    'previous_close',
+    'price_close',
+    'price_date',
+    'price_open',
+    'price_purchased',
+    'price_source',
+    'price',
+    'prospectus_link',
+    'quantum_online_link',
+    'risk',
+    'sector',
+    'stock_name',
+    'ticker',
+    'type',
+    'updated_at',
+    'week_high_52',
+    'week_low_52',
+    'ytm',
+  ];
+}

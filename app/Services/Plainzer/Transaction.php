@@ -2,7 +2,7 @@
 
 namespace App\Services\Plainzer;
 
-// use App\Models\Transaction as TransactionModel;
+use App\Models\Transaction as TransactionModel;
 use App\Models\Account as AccountModel;
 
 class Transaction extends Base {
@@ -24,7 +24,27 @@ class Transaction extends Base {
     $transactions = $this->request(options: $options);
 
     foreach ($transactions as $transaction) {
-      $debug = $transaction;
+      $account = AccountModel::where('external_id', $transaction->portfolio->portfolioId)
+        ->orWhere('alias', $transaction->portfolio->name)
+        ->first();
+
+      $model = TransactionModel::where('external_id', $transaction->transactionId)
+        ->orWhere('uuid', $transaction->externalTransactionId)
+        ->first();
+
+      if (!$model) {
+        $model = TransactionModel::whereRaw("DATE_FORMAT(date, '%Y-%m-%d')", $transaction->tradeDate)
+          ->where('units', $transaction->quantity)
+          ->where('unit_price', $transaction->costPerItem)
+          ->where('type', $transaction->type)
+          ->where('ticker', $transaction->ticker->symbol)
+          ->where('account_id', $account->id)
+          ->firstOrNew()
+        ;
+      }
+
+      $model->fillFromPlainzer($transaction);
+      $model->save();
     }
   }
 }
