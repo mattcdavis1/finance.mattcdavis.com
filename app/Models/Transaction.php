@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Account as AccountModel;
+use App\Models\Security as SecurityModel;
+use App\Traits\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Traits\UsesUuid;
 
 class Transaction extends Model
 {
@@ -70,18 +72,19 @@ class Transaction extends Model
 
   public function fillFromPlainzer($data) {
     foreach ([
-      'external_id' => 'externalTransactionId',
+      'external_id' => 'transactionId',
       'type' => 'type',
       'units' => 'quantity',
       'unit_price' => 'costPerItem',
-      'total_cost' => 'totalCost',
+      'amount' => 'totalCost',
       'date' => 'tradeDate',
-      'created_at_exteral' => 'createdOn',
+      'created_at_external' => 'createdOn',
       'updated_at_external' => 'updatedOn',
     ] as $local => $external) {
       $this->{$local} = $data->{$external};
     }
 
+    // security
     $security = SecurityModel::where('external_id', $data->ticker->tickerId)
       ->first();
 
@@ -89,7 +92,7 @@ class Transaction extends Model
       $security = SecurityModel::where('ticker', $data->ticker->symbol)
         ->firstOrNew();
 
-      $security->externalId = $data->ticker->tickerId;
+      $security->external_id = $data->ticker->tickerId;
       $security->ticker = $data->ticker->symbol;
       $security->stock_name = $data->ticker->name;
       $security->save();
@@ -98,7 +101,25 @@ class Transaction extends Model
       $security->save();
     }
 
-    $this->security_id = $data->ticker->tickerId;
+    $this->security_id = $security->id;
+
+    // account
+    $account = AccountModel::where('external_id', $data->portfolio->portfolioId)
+      ->first();
+
+    if (!$account) {
+      $account = AccountModel::where('alias', $data->portfolio->name)
+        ->orWhere('name', $data->portfolio->name)
+        ->firstOrNew();
+
+      $account->external_id = $data->portfolio->portfolioId;
+      empty($account->alias) && $account->alias = $data->portfolio->name;
+      empty($account->name) && $account->name = $data->portfolio->name;
+
+      $account->save();
+    }
+
+    $this->account_id = $account->id;
   }
 
   public function source(): BelongsTo

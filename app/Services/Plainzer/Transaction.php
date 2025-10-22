@@ -2,6 +2,7 @@
 
 namespace App\Services\Plainzer;
 
+use App\Models\Security as SecurityModel;
 use App\Models\Transaction as TransactionModel;
 use App\Models\Account as AccountModel;
 
@@ -21,26 +22,40 @@ class Transaction extends Base {
         'portfolioId' => $accountModel->external_id,
       ];
     }
-    $transactions = $this->request(options: $options);
+    $response = $this->request(options: $options);
 
-    foreach ($transactions as $transaction) {
+    foreach ($response->result as $transaction) {
       $account = AccountModel::where('external_id', $transaction->portfolio->portfolioId)
         ->orWhere('alias', $transaction->portfolio->name)
         ->first();
 
-      $model = TransactionModel::where('external_id', $transaction->transactionId)
-        ->orWhere('uuid', $transaction->externalTransactionId)
-        ->first();
+      $query = TransactionModel::where('external_id', $transaction->transactionId);
+      if ($transaction->externalTransactionId) {
+        $query->orWhere('externalTransactionId', $transaction->externalTransactionId);
+      }
+
+      $model = $query->first();
 
       if (!$model) {
-        $model = TransactionModel::whereRaw("DATE_FORMAT(date, '%Y-%m-%d')", $transaction->tradeDate)
+        $security = SecurityModel::where('external_id', $transaction->ticker->tickerId)->first();
+        if (!$security) {
+          SecurityModel::where('ticker', $transaction->ticker->symbol)->first();
+        }
+
+        $query = TransactionModel::whereRaw("DATE_FORMAT(date, '%Y-%m-%d') = ?", [ $transaction->tradeDate ])
           ->where('units', $transaction->quantity)
           ->where('unit_price', $transaction->costPerItem)
           ->where('type', $transaction->type)
-          ->where('ticker', $transaction->ticker->symbol)
           ->where('account_id', $account->id)
-          ->firstOrNew()
         ;
+
+        if ($security) {
+          $query->where('security_id', $security->id);
+        } else {
+          $query->where('symbol', $transaction->ticker->symbol);
+        }
+
+        $model = $query->firstOrNew();
       }
 
       $model->fillFromPlainzer($transaction);
