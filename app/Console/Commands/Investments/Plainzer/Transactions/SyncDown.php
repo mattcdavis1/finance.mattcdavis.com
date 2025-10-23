@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Console\Commands\Investments\Plainzer;
+namespace App\Console\Commands\Investments\Plainzer\Transactions;
 
 use Illuminate\Console\Command;
 use App\Models\Account;
 use App\Services\Plainzer\Transaction as PlainzerTransaction;
 
-class SyncDownTransactions extends Command
+class SyncDown extends Command
 {
   protected $signature = 'plainzer:sync-down.transactions
     {--account-slug=}

@@ -616,15 +616,21 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
     );
 
     public static $classMap = array (
-        'App\\Console\\Commands\\Import\\Transactions' => __DIR__ . '/../..' . '/app/Console/Commands/Import/Transactions.php',
+        'App\\Console\\Commands\\Investments\\Plainzer\\Transactions\\SyncDown' => __DIR__ . '/../..' . '/app/Console/Commands/Investments/Plainzer/Transactions/SyncDown.php',
+        'App\\Console\\Commands\\Investments\\Plainzer\\Transactions\\SyncUp' => __DIR__ . '/../..' . '/app/Console/Commands/Investments/Plainzer/Transactions/SyncUp.php',
+        'App\\Console\\Commands\\Investments\\Transactions\\Import' => __DIR__ . '/../..' . '/app/Console/Commands/Investments/Transactions/Import.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Models\\Account' => __DIR__ . '/../..' . '/app/Models/Account.php',
         'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Category.php',
         'App\\Models\\Payee' => __DIR__ . '/../..' . '/app/Models/Payee.php',
+        'App\\Models\\Security' => __DIR__ . '/../..' . '/app/Models/Security.php',
         'App\\Models\\Transaction' => __DIR__ . '/../..' . '/app/Models/Transaction.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\Vendor' => __DIR__ . '/../..' . '/app/Models/Vendor.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
+        'App\\Services\\Plainzer\\Base' => __DIR__ . '/../..' . '/app/Services/Plainzer/Base.php',
+        'App\\Services\\Plainzer\\Transaction' => __DIR__ . '/../..' . '/app/Services/Plainzer/Transaction.php',
+        'App\\Traits\\UsesUuid' => __DIR__ . '/../..' . '/app/Traits/UsesUuid.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
         'Brick\\Math\\BigInteger' => __DIR__ . '/..' . '/brick/math/src/BigInteger.php',

@@ -6,15 +6,21 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Console\\Commands\\Import\\Transactions' => $baseDir . '/app/Console/Commands/Import/Transactions.php',
+    'App\\Console\\Commands\\Investments\\Plainzer\\Transactions\\SyncDown' => $baseDir . '/app/Console/Commands/Investments/Plainzer/Transactions/SyncDown.php',
+    'App\\Console\\Commands\\Investments\\Plainzer\\Transactions\\SyncUp' => $baseDir . '/app/Console/Commands/Investments/Plainzer/Transactions/SyncUp.php',
+    'App\\Console\\Commands\\Investments\\Transactions\\Import' => $baseDir . '/app/Console/Commands/Investments/Transactions/Import.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Models\\Account' => $baseDir . '/app/Models/Account.php',
     'App\\Models\\Category' => $baseDir . '/app/Models/Category.php',
     'App\\Models\\Payee' => $baseDir . '/app/Models/Payee.php',
+    'App\\Models\\Security' => $baseDir . '/app/Models/Security.php',
     'App\\Models\\Transaction' => $baseDir . '/app/Models/Transaction.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Models\\Vendor' => $baseDir . '/app/Models/Vendor.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
+    'App\\Services\\Plainzer\\Base' => $baseDir . '/app/Services/Plainzer/Base.php',
+    'App\\Services\\Plainzer\\Transaction' => $baseDir . '/app/Services/Plainzer/Transaction.php',
+    'App\\Traits\\UsesUuid' => $baseDir . '/app/Traits/UsesUuid.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Brick\\Math\\BigDecimal' => $vendorDir . '/brick/math/src/BigDecimal.php',
     'Brick\\Math\\BigInteger' => $vendorDir . '/brick/math/src/BigInteger.php',

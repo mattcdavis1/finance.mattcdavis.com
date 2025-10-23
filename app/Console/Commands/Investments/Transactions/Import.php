@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands\Investments;
+namespace App\Console\Commands\Investments\Transactions;
 
 use App\Models\Account;
 use App\Models\Transaction;
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Csv\Reader;
 use League\Csv\Statement;
 
-class ImportTransactions extends Command
+class Import extends Command
 {
   protected $signature = 'app:investments.import-transactions
     {--path=}
