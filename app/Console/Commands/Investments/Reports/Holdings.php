@@ -37,8 +37,9 @@ class Holdings extends Command
     foreach ($query->get() as $holding) {
       if ($accountAlias != $holding->alias) {
         $this->comment(PHP_EOL . $holding->alias);
+        $this->comment('Ticker | Units    | Cost');
       }
-      $this->info('[ticker:' . $holding->ticker . '] [units: ' . $holding->units . '] [cost:' . $holding->cost .']');
+      $this->info(str_pad($holding->ticker, 7) . '| ' . str_pad($holding->units, 9) . '| ' . $holding->cost);
       $accountAlias = $holding->alias;
     }
   }
