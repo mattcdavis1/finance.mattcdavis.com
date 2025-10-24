@@ -9,8 +9,85 @@ use App\Models\Account as AccountModel;
 class Transaction extends Base {
   protected $path = '/v1/public/transactions';
 
-  public function syncUp()
+  public function clean()
   {
+    $query = TransactionModel::select('t.*')
+      ->from('transactions as t')
+      ->join('accounts as a', 't.account_id', '=', 'a.id')
+      ->where('a.type', 'brokerage');
+
+    // add security_id to transactions
+    foreach ($query->get() as $transaction) {
+      if (!$transaction->security_id) {
+        if (!$transaction->symbol) {
+          $this->logger->error('Missing Ticker for Transaction ' . $transaction->id);
+          continue;
+        }
+
+        $security = SecurityModel::where('ticker', $transaction->symbol)->first();
+        if ($security) {
+          $this->logger->info('Updating Transaction ' . $transaction->id);
+
+          $transaction->security_id = $security->id;
+          $transaction->save();
+        } else {
+          $this->logger->error('Missing Security for Ticker ' . $transaction->symbol);
+          $securityModel = SecurityModel::create([
+            'ticker' => $transaction->symbol,
+          ]);
+          $securityModel->save();
+        }
+      } else {
+        $this->logger->comment('No Update Needed for Transaction ' . $transaction->id);
+      }
+    }
+  }
+
+  public function create(TransactionModel $transaction)
+  {
+    $account = $transaction->account;
+    $security = $transaction->security;
+
+    $json = [
+      'externalTransactionId' => $transaction->uuid,
+      'type' => $transaction->type,
+      'ticker' => $transaction->security->ticker,
+      'quantity' => $transaction->units,
+      'costPerItem' => $transaction->unit_price,
+      'tradeDate' => $transaction->date->format('Y-m-d'),
+      'portfolioId' => $transaction->account->external_id,
+    ];
+    $response = $this->request('POST', [
+      'json' => $json
+    ]);
+
+    return $response;
+  }
+
+  public function syncUp(
+    ?int $accountId = null,
+    $unsyncedOnly = true,
+  ) {
+    $query = TransactionModel::select('t.*')
+      ->from('transactions as t')
+      ->join('accounts as a', 't.account_id', '=', 'a.id')
+      ->where('a.type', 'brokerage');
+
+    if ($accountId) {
+      $query->where('t.account_id', $accountId);
+    }
+
+    if ($unsyncedOnly) {
+      $query->whereNull('t.external_id');
+    }
+
+    foreach ($query->get() as $transaction) {
+      if ($transaction->external_id) {
+        $this->update($transaction);
+      } else {
+        $this->create($transaction);
+      }
+    }
   }
 
   public function syncDown(
@@ -61,5 +138,10 @@ class Transaction extends Base {
       $model->fillFromPlainzer($transaction);
       $model->save();
     }
+  }
+
+  public function update(TransactionModel $transaction)
+  {
+    // @TODO
   }
 }

@@ -62,7 +62,7 @@ class Transaction extends Model
 
   public function account(): BelongsTo
   {
-    return $this->belongsTo(Account::class);
+    return $this->belongsTo(AccountModel::class);
   }
 
   public function category(): BelongsTo
@@ -122,6 +122,11 @@ class Transaction extends Model
     $this->account_id = $account->id;
   }
 
+  public function security(): BelongsTo
+  {
+    return $this->belongsTo(SecurityModel::class);
+  }
+
   public function source(): BelongsTo
   {
     return $this->belongsTo(Source::class);
@@ -134,11 +139,11 @@ class Transaction extends Model
 
   public function transferFromAccount(): BelongsTo
   {
-    return $this->belongsTo(Account::class, 'transfer_from_account_id');
+    return $this->belongsTo(AccountModel::class, 'transfer_from_account_id');
   }
 
   public function transferToAccount(): BelongsTo
   {
-    return $this->belongsTo(Account::class, 'transfer_to_account_id');
+    return $this->belongsTo(AccountModel::class, 'transfer_to_account_id');
   }
 }

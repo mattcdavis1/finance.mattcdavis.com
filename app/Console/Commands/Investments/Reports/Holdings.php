@@ -21,11 +21,6 @@ class Holdings extends Command
       securities.ticker,
       accounts.alias
     ')
-      // ->addSelect([
-      //   'securities.ticker',
-      //   'accounts.name',
-      //   'accounts.alias',
-      // ])
       ->join('securities', 'transactions.security_id', '=', 'securities.id')
       ->join('accounts', 'transactions.account_id', '=', 'accounts.id')
       ->groupByRaw('security_id, securities.ticker, accounts.alias')

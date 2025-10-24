@@ -2,20 +2,22 @@
 
 namespace App\Services\Plainzer;
 
+use App\Services\Util\Logger;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
 use stdClass;
 
 class Base
 {
   protected $baseUrl = 'https://api.plainzer.com';
   protected $client;
+  protected $logger;
   protected $path = '/';
 
   public function __construct()
   {
     $this->client = new Client();
+    $this->logger = new Logger();
   }
 
   public function request(
@@ -61,5 +63,10 @@ class Base
 
       return $result;
     }
+  }
+
+  public function setLogger($logger)
+  {
+    $this->logger = $logger;
   }
 }
