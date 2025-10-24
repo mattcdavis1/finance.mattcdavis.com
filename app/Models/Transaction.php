@@ -102,6 +102,7 @@ class Transaction extends Model
     }
 
     $this->security_id = $security->id;
+    $this->symbol = $security->ticker;
 
     // account
     $account = AccountModel::where('external_id', $data->portfolio->portfolioId)

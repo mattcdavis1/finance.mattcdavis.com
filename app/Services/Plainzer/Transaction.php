@@ -74,7 +74,6 @@ class Transaction extends Base {
       } else {
         $this->logger->error('[' . $response->code .'] ' . $response->error);
       }
-
     }
 
     return $response;

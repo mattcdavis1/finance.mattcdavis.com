@@ -67,7 +67,7 @@ class Base
         $result->result = $response->getBody()->getContents();
       }
 
-      sleep(0.5);
+      sleep(1);
 
       return $result;
     }
