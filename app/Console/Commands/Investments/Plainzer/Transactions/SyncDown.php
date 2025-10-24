@@ -16,10 +16,13 @@ class SyncDown extends Command
   public function handle()
   {
     $accountSlug = $this->option('account-slug');
-    $account = Account::where('slug', $accountSlug)
-      ->first();
+    $accountModel = $accountSlug
+      ? Account::where('slug', $accountSlug)
+        ->first()
+      : null;
 
     $plainzer = app(PlainzerTransaction::class);
-    $plainzer->syncDown();
+    $plainzer->setLogger($this);
+    $plainzer->syncDown($accountModel);
   }
 }

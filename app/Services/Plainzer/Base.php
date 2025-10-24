@@ -21,16 +21,22 @@ class Base
   }
 
   public function request(
-    $url = null,
     $method = 'get',
+    $url = null,
     $options = [],
   ) : ?stdClass {
     $requestUrl = $url ?? $this->baseUrl . $this->path;
-    $requestOptions['headers'] = $options['headers'] ?? [];
+    $requestOptions = $options ?? [];
+
+    empty($requestOptions['headers']) && $requestOptions['headers'] = [];
     $requestOptions['headers']['Authorization'] = 'Bearer ' . env('PLAINZER_API_KEY');
 
     if (!isset($requestOptions['headers']['Accept'])) {
-      $requestOptions['headers']['Accept'] = 'application/json';
+      $requestOptions['headers']['Accept'] = '*/*';
+    }
+
+    if (!isset($requestOptions['headers']['Content-Type'])) {
+      $requestOptions['headers']['Content-Type'] = 'application/json';
     }
 
     try {
@@ -58,8 +64,10 @@ class Base
       if ($e->hasResponse()) {
         $response = $e->getResponse();
         $result->code = $response->getStatusCode();
-        $result->result . $response->getBody()->getContents();
+        $result->result = $response->getBody()->getContents();
       }
+
+      sleep(0.5);
 
       return $result;
     }

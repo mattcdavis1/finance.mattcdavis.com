@@ -45,21 +45,37 @@ class Transaction extends Base {
 
   public function create(TransactionModel $transaction)
   {
-    $account = $transaction->account;
-    $security = $transaction->security;
-
     $json = [
       'externalTransactionId' => $transaction->uuid,
-      'type' => $transaction->type,
+      'type' => ucfirst($transaction->type),
       'ticker' => $transaction->security->ticker,
       'quantity' => $transaction->units,
       'costPerItem' => $transaction->unit_price,
       'tradeDate' => $transaction->date->format('Y-m-d'),
       'portfolioId' => $transaction->account->external_id,
     ];
-    $response = $this->request('POST', [
-      'json' => $json
-    ]);
+    $response = $this->request(
+      method: 'POST',
+      options: [
+        'json' => $json,
+      ],
+    );
+
+    if ($response->success) {
+      $result = $response->result;
+
+      $transaction->external_id = $result->externalTransactionId;
+      $transaction->save();
+
+      $this->logger->info('['  . $result->externalTransactionId . '][' . $result->ticker->symbol . '][' . $result->tradeDate .'][' . $result->portfolio->name .']');
+    } else {
+      if ($response->result) {
+        $this->logger->error($response->result);
+      } else {
+        $this->logger->error('[' . $response->code .'] ' . $response->error);
+      }
+
+    }
 
     return $response;
   }
@@ -101,41 +117,42 @@ class Transaction extends Base {
     }
     $response = $this->request(options: $options);
 
-    foreach ($response->result as $transaction) {
-      $account = AccountModel::where('external_id', $transaction->portfolio->portfolioId)
-        ->orWhere('alias', $transaction->portfolio->name)
+    foreach ($response->result as $result) {
+      $this->logger->info('['  . $result->transactionId . '][' . $result->ticker->symbol . '][' . $result->tradeDate .'][' . $result->portfolio->name .']');
+      $account = AccountModel::where('external_id', $result->portfolio->portfolioId)
+        ->orWhere('alias', $result->portfolio->name)
         ->first();
 
-      $query = TransactionModel::where('external_id', $transaction->transactionId);
-      if ($transaction->externalTransactionId) {
-        $query->orWhere('externalTransactionId', $transaction->externalTransactionId);
+      $query = TransactionModel::where('external_id', $result->transactionId);
+      if ($result->externalTransactionId) {
+        $query->orWhere('external_id', $result->externalTransactionId);
       }
 
       $model = $query->first();
 
       if (!$model) {
-        $security = SecurityModel::where('external_id', $transaction->ticker->tickerId)->first();
+        $security = SecurityModel::where('external_id', $result->ticker->tickerId)->first();
         if (!$security) {
-          SecurityModel::where('ticker', $transaction->ticker->symbol)->first();
+          SecurityModel::where('ticker', $result->ticker->symbol)->first();
         }
 
-        $query = TransactionModel::whereRaw("DATE_FORMAT(date, '%Y-%m-%d') = ?", [ $transaction->tradeDate ])
-          ->where('units', $transaction->quantity)
-          ->where('unit_price', $transaction->costPerItem)
-          ->where('type', $transaction->type)
+        $query = TransactionModel::whereRaw("DATE_FORMAT(date, '%Y-%m-%d') = ?", [ $result->tradeDate ])
+          ->where('units', $result->quantity)
+          ->where('unit_price', $result->costPerItem)
+          ->where('type', $result->type)
           ->where('account_id', $account->id)
         ;
 
         if ($security) {
           $query->where('security_id', $security->id);
         } else {
-          $query->where('symbol', $transaction->ticker->symbol);
+          $query->where('symbol', $result->ticker->symbol);
         }
 
         $model = $query->firstOrNew();
       }
 
-      $model->fillFromPlainzer($transaction);
+      $model->fillFromPlainzer($result);
       $model->save();
     }
   }

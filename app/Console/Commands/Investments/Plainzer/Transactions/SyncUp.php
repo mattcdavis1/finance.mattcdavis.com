@@ -14,10 +14,11 @@ class SyncUp extends Command
 
   public function handle()
   {
-    app(PlainzerTransaction::class)
-      ->syncUp(
-        accountId: $this->option('account-id'),
-        unsyncedOnly: true,
-      );
+    $plainzer = app(PlainzerTransaction::class);
+    $plainzer->setLogger($this);
+    $plainzer->syncUp(
+      accountId: $this->option('account-id'),
+      unsyncedOnly: true,
+    );
   }
 }
